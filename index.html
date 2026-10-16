@@ -1,0 +1,2146 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calculadora de Presupuestos · Lost Astronauta</title>
+<meta name="description" content="Calculadora de presupuestos para industrias creativas. Diseño, música, arte, asesorías. Saludos Protónicos.">
+<meta name="theme-color" content="#060606">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23060606'/%3E%3Ctext x='50' y='68' font-family='Orbitron,sans-serif' font-weight='900' font-size='48' fill='%2306FF23' text-anchor='middle'%3ELA%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Share+Tech+Mono&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   LOST ASTRONAUTA · Calculadora de Presupuestos
+   DOC.002 — Herramienta para tripulantes de industrias creativas
+   ============================================================ */
+:root {
+  --la-black: #060606;
+  --la-navy: #1A1A1A;
+  --la-navy-2: #141414;
+  --la-white: #F0F0EE;
+  --la-muted: #9AA0A6;
+  --la-muted-2: #6B7075;
+  --la-green: #06FF23;
+  --la-green-rgb: 6, 255, 35;
+  --la-green-dim: #04c91b;
+  --la-cyan: #00D4FF;
+  --la-yellow: #FFD600;
+  --la-purple: #8B5CF6;
+  --la-red: #FF3B3B;
+  --la-border: rgba(240, 240, 238, 0.08);
+  --la-border-active: rgba(6, 255, 35, 0.4);
+  --la-radius: 14px;
+  --la-radius-sm: 8px;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--la-black);
+  color: var(--la-white);
+  font-family: 'Space Mono', ui-monospace, Menlo, monospace;
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* Fondo con grid cósmico + scanlines sutiles */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(6, 255, 35, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(6, 255, 35, 0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: 0;
+}
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.15) 0px,
+    rgba(0, 0, 0, 0.15) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.4;
+}
+
+.la-root { position: relative; z-index: 2; }
+.la-wrap { max-width: 1200px; margin: 0 auto; padding: 32px 20px 80px; }
+
+/* ---------- HEADER ---------- */
+.la-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 16px 20px;
+  border: 1px solid var(--la-border);
+  border-radius: var(--la-radius);
+  background: linear-gradient(135deg, rgba(6, 255, 35, 0.04), transparent 60%);
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+.la-brand { display: flex; align-items: center; gap: 14px; }
+.la-logo {
+  width: 48px; height: 48px;
+  border: 1.5px solid var(--la-green);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 900;
+  font-size: 18px;
+  color: var(--la-green);
+  letter-spacing: 1px;
+  box-shadow: 0 0 20px rgba(6, 255, 35, 0.25), inset 0 0 12px rgba(6, 255, 35, 0.1);
+  flex-shrink: 0;
+}
+.la-brand-text { display: flex; flex-direction: column; line-height: 1.1; }
+.la-brand-text strong {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 900;
+  font-size: 14px;
+  letter-spacing: 3px;
+  color: var(--la-white);
+}
+.la-brand-text span {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--la-green);
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+.la-hud {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  color: var(--la-muted-2);
+  text-align: right;
+  text-transform: uppercase;
+  line-height: 1.6;
+}
+.la-hud .ok { color: var(--la-green); }
+
+/* ---------- HERO ---------- */
+.la-hero { text-align: center; margin-bottom: 36px; }
+.la-kicker {
+  display: inline-block;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--la-green);
+  border: 1px solid var(--la-border-active);
+  background: rgba(6, 255, 35, 0.06);
+  padding: 6px 16px;
+  border-radius: 999px;
+  margin-bottom: 18px;
+}
+.la-h1 {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 900;
+  font-size: clamp(28px, 5vw, 48px);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin: 0 0 14px;
+  color: var(--la-white);
+}
+.la-h1 .accent {
+  color: var(--la-green);
+  text-shadow: 0 0 30px rgba(6, 255, 35, 0.4);
+}
+.la-hero p {
+  color: var(--la-muted);
+  max-width: 620px;
+  margin: 0 auto;
+  font-size: 15px;
+}
+
+/* ---------- NIVELES ---------- */
+.la-levels-lead {
+  text-align: center;
+  color: var(--la-muted);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin: 0 0 14px;
+}
+.la-levels {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.la-level {
+  background: var(--la-navy);
+  border: 1.5px solid var(--la-border);
+  border-radius: var(--la-radius);
+  padding: 18px;
+  text-align: left;
+  color: var(--la-white);
+  cursor: pointer;
+  transition: border-color 0.18s, transform 0.18s, background 0.18s;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-family: inherit;
+}
+.la-level:hover {
+  border-color: rgba(6, 255, 35, 0.3);
+  transform: translateY(-2px);
+}
+.la-level-num {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 900;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--la-muted-2);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.la-level-num::before {
+  content: '';
+  width: 8px; height: 8px;
+  background: var(--la-muted-2);
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(107, 112, 117, 0.2);
+}
+.la-level-name {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+  color: var(--la-white);
+}
+.la-level-desc {
+  font-size: 13px;
+  color: var(--la-muted);
+  line-height: 1.5;
+}
+.la-level.is-active {
+  border-color: var(--la-green);
+  background: linear-gradient(160deg, rgba(6, 255, 35, 0.1), rgba(26, 26, 26, 0.8));
+  box-shadow: 0 0 30px rgba(6, 255, 35, 0.1);
+}
+.la-level.is-active .la-level-num { color: var(--la-green); }
+.la-level.is-active .la-level-num::before {
+  background: var(--la-green);
+  box-shadow: 0 0 10px var(--la-green);
+}
+
+.la-levelhint {
+  background: rgba(6, 255, 35, 0.04);
+  border: 1px dashed rgba(6, 255, 35, 0.25);
+  border-radius: var(--la-radius-sm);
+  padding: 14px 18px;
+  font-size: 13px;
+  color: var(--la-muted);
+  margin-bottom: 28px;
+  font-family: 'Share Tech Mono', monospace;
+  letter-spacing: 0.5px;
+}
+.la-levelhint strong { color: var(--la-green); font-weight: 400; }
+
+/* ---------- GRID ---------- */
+.la-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 380px;
+  gap: 24px;
+  align-items: start;
+}
+
+/* ---------- CARDS ---------- */
+.la-card {
+  background: var(--la-navy);
+  border: 1px solid var(--la-border);
+  border-radius: var(--la-radius);
+  padding: 24px;
+  margin-bottom: 18px;
+  position: relative;
+}
+.la-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 24px; right: 24px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(6, 255, 35, 0.3), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.la-card:hover::before { opacity: 1; }
+
+.la-card-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 6px;
+}
+.la-step {
+  flex: 0 0 auto;
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  background: var(--la-black);
+  border: 1.5px solid var(--la-green);
+  color: var(--la-green);
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 900;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 12px rgba(6, 255, 35, 0.2);
+}
+.la-card-head h3 {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+  color: var(--la-white);
+  margin: 0;
+  line-height: 1.4;
+  flex: 1;
+}
+.la-card-sub {
+  color: var(--la-muted);
+  font-size: 13px;
+  margin: 6px 0 22px 46px;
+  line-height: 1.5;
+}
+
+/* ---------- CAMPOS ---------- */
+.la-field { margin-bottom: 18px; }
+.la-field:last-child { margin-bottom: 0; }
+.la-label {
+  display: block;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--la-green);
+  margin-bottom: 6px;
+  font-weight: 400;
+}
+.la-help {
+  display: block;
+  font-size: 12.5px;
+  color: var(--la-muted);
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+.la-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.la-row-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+
+.la-input-wrap { position: relative; display: flex; align-items: center; }
+.la-prefix, .la-suffix {
+  position: absolute;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  color: var(--la-muted-2);
+  pointer-events: none;
+  letter-spacing: 1px;
+}
+.la-prefix { left: 14px; }
+.la-suffix { right: 14px; }
+
+input[type="number"], input[type="text"], select {
+  width: 100%;
+  background: var(--la-black);
+  color: var(--la-white);
+  border: 1.5px solid var(--la-border);
+  border-radius: var(--la-radius-sm);
+  padding: 12px 14px;
+  font-family: 'Space Mono', monospace;
+  font-size: 15px;
+  font-weight: 700;
+  outline: none;
+  transition: border-color 0.16s, box-shadow 0.16s;
+  -webkit-appearance: none;
+  appearance: none;
+  height: auto;
+  min-height: 0;
+  line-height: 1.4;
+  margin: 0;
+}
+input.has-prefix { padding-left: 36px; }
+input.has-suffix { padding-right: 60px; }
+input:focus, select:focus {
+  border-color: var(--la-green);
+  box-shadow: 0 0 0 3px rgba(6, 255, 35, 0.15);
+}
+input::placeholder { color: var(--la-muted-2); font-weight: 400; }
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+input[type=number] { -moz-appearance: textfield; }
+select {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2306FF23' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  padding-right: 40px;
+  cursor: pointer;
+}
+select option { background: var(--la-navy); color: var(--la-white); }
+
+.la-readout {
+  background: var(--la-black);
+  border: 1.5px dashed rgba(6, 255, 35, 0.3);
+  border-radius: var(--la-radius-sm);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.la-readout-label {
+  display: block;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--la-green);
+  margin-bottom: 4px;
+}
+.la-readout-sub {
+  display: block;
+  font-size: 12px;
+  color: var(--la-muted);
+  line-height: 1.4;
+}
+.la-readout-val {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--la-white);
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+/* ---------- TOGGLES ---------- */
+.la-toggles { display: flex; flex-direction: column; gap: 10px; }
+.la-toggle {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  text-align: left;
+  background: var(--la-black);
+  border: 1.5px solid var(--la-border);
+  border-radius: var(--la-radius-sm);
+  padding: 12px 14px;
+  color: var(--la-white);
+  cursor: pointer;
+  transition: border-color 0.16s, background 0.16s;
+  font-family: inherit;
+}
+.la-toggle:hover { border-color: rgba(6, 255, 35, 0.3); }
+.la-switch {
+  flex: 0 0 auto;
+  width: 40px; height: 22px;
+  border-radius: 999px;
+  background: rgba(240, 240, 238, 0.08);
+  position: relative;
+  transition: background 0.18s;
+  border: 1px solid var(--la-border);
+}
+.la-switch::after {
+  content: '';
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--la-muted-2);
+  transition: transform 0.18s, background 0.18s;
+}
+.la-toggle.is-on .la-switch {
+  background: rgba(6, 255, 35, 0.2);
+  border-color: var(--la-green);
+}
+.la-toggle.is-on .la-switch::after {
+  transform: translateX(18px);
+  background: var(--la-green);
+  box-shadow: 0 0 8px var(--la-green);
+}
+.la-toggle-body { flex: 1; min-width: 0; }
+.la-toggle-q {
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  display: block;
+  line-height: 1.35;
+}
+.la-toggle-a {
+  font-size: 12px;
+  color: var(--la-muted);
+  display: block;
+  margin-top: 2px;
+}
+.la-badge {
+  flex: 0 0 auto;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 1px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.la-badge.up { background: rgba(255, 59, 59, 0.15); color: var(--la-red); border: 1px solid rgba(255, 59, 59, 0.3); }
+.la-badge.down { background: rgba(6, 255, 35, 0.1); color: var(--la-green); border: 1px solid rgba(6, 255, 35, 0.3); }
+.la-badge.flat { background: rgba(240, 240, 238, 0.05); color: var(--la-muted); border: 1px solid var(--la-border); }
+
+.la-factor {
+  margin-top: 16px;
+  background: var(--la-black);
+  border: 1px dashed rgba(6, 255, 35, 0.25);
+  border-radius: var(--la-radius-sm);
+  padding: 14px 16px;
+  font-size: 13px;
+  color: var(--la-muted);
+  line-height: 1.55;
+  font-family: 'Share Tech Mono', monospace;
+  letter-spacing: 0.3px;
+}
+.la-factor b { color: var(--la-green); font-family: 'Orbitron', sans-serif; font-size: 16px; font-weight: 700; }
+
+/* ---------- NOTE ---------- */
+.la-note {
+  border-left: 3px solid var(--la-green);
+  background: rgba(6, 255, 35, 0.04);
+  border-radius: 0 var(--la-radius-sm) var(--la-radius-sm) 0;
+  padding: 12px 16px;
+  font-size: 12.5px;
+  color: var(--la-muted);
+  margin-top: 16px;
+  line-height: 1.55;
+}
+.la-note strong { color: var(--la-green); font-weight: 700; }
+
+/* ---------- RESULT PANEL ---------- */
+.la-result-col { position: sticky; top: 20px; }
+.la-result {
+  background: linear-gradient(165deg, rgba(6, 255, 35, 0.08), var(--la-navy) 60%);
+  border: 1.5px solid var(--la-border-active);
+  border-radius: var(--la-radius);
+  padding: 24px;
+  overflow: hidden;
+  position: relative;
+}
+.la-result::before {
+  content: '';
+  position: absolute;
+  top: -50%; right: -50%;
+  width: 200%; height: 200%;
+  background: radial-gradient(circle, rgba(6, 255, 35, 0.08) 0%, transparent 40%);
+  pointer-events: none;
+}
+.la-result-kicker {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--la-green);
+  margin-bottom: 10px;
+  position: relative;
+}
+.la-price {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(32px, 4.5vw, 44px);
+  font-weight: 900;
+  color: var(--la-white);
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  word-break: break-word;
+  position: relative;
+  text-shadow: 0 0 40px rgba(6, 255, 35, 0.15);
+}
+.la-price-note {
+  font-size: 12.5px;
+  color: var(--la-muted);
+  margin-top: 10px;
+  line-height: 1.5;
+  position: relative;
+}
+.la-rango {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--la-border);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  position: relative;
+}
+.la-rango-lbl {
+  display: block;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--la-muted-2);
+}
+.la-rango-val {
+  display: block;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--la-white);
+  margin-top: 4px;
+  letter-spacing: -0.01em;
+  word-break: break-word;
+}
+.la-rango-hint {
+  display: block;
+  font-size: 11px;
+  color: var(--la-muted-2);
+  margin-top: 3px;
+  line-height: 1.4;
+}
+
+.la-break {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--la-border);
+  position: relative;
+}
+.la-break-title {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--la-muted-2);
+  margin-bottom: 12px;
+}
+.la-break-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+  padding: 5px 0;
+}
+.la-break-row span:first-child { color: var(--la-muted); }
+.la-break-row span:last-child { font-weight: 700; white-space: nowrap; color: var(--la-white); }
+.la-break-row.is-sub { border-top: 1px solid var(--la-border); margin-top: 6px; padding-top: 10px; }
+.la-break-row.is-sub span { color: var(--la-white); font-weight: 700; }
+.la-break-row.is-neg span:last-child { color: var(--la-green); }
+
+.la-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; position: relative; }
+.la-btn {
+  border: none;
+  border-radius: var(--la-radius-sm);
+  padding: 14px 18px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  transition: transform 0.14s, filter 0.14s, box-shadow 0.14s;
+  width: 100%;
+  line-height: 1.3;
+  text-align: center;
+  cursor: pointer;
+}
+.la-btn:active { transform: scale(0.985); }
+.la-btn-primary {
+  background: var(--la-green);
+  color: var(--la-black);
+  box-shadow: 0 0 20px rgba(6, 255, 35, 0.3);
+}
+.la-btn-primary:hover { filter: brightness(1.1); box-shadow: 0 0 30px rgba(6, 255, 35, 0.5); }
+.la-btn-ghost {
+  background: transparent;
+  color: var(--la-white);
+  border: 1.5px solid var(--la-border);
+}
+.la-btn-ghost:hover { border-color: var(--la-green); color: var(--la-green); }
+
+/* ---------- FOOTER ---------- */
+.la-foot {
+  margin-top: 40px;
+  border-top: 1px solid var(--la-border);
+  padding-top: 30px;
+  text-align: center;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--la-muted-2);
+}
+.la-foot strong { color: var(--la-green); font-weight: 400; }
+.la-foot-sig {
+  margin-top: 12px;
+  color: var(--la-green);
+  font-size: 12px;
+  letter-spacing: 3px;
+}
+
+/* ---------- TOAST ---------- */
+.la-toast {
+  position: fixed;
+  left: 50%; bottom: 26px;
+  transform: translate(-50%, 20px);
+  background: var(--la-green);
+  color: var(--la-black);
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 12px 22px;
+  border-radius: 999px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s, transform 0.2s;
+  z-index: 99999;
+  box-shadow: 0 0 30px rgba(6, 255, 35, 0.4);
+}
+.la-toast.is-on { opacity: 1; transform: translate(-50%, 0); }
+
+/* ---------- UTILS ---------- */
+.la-hide { display: none !important; }
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 940px) {
+  .la-grid { grid-template-columns: 1fr; }
+  .la-result-col { position: static; }
+  .la-levels { grid-template-columns: 1fr; }
+  .la-wrap { padding: 20px 14px 60px; }
+}
+@media (max-width: 700px) {
+  .la-row, .la-row-3 { grid-template-columns: 1fr; }
+  .la-card-sub { margin-left: 0; }
+}
+@media (max-width: 560px) {
+  .la-rango { grid-template-columns: 1fr; }
+  .la-header { flex-direction: column; align-items: flex-start; }
+  .la-hud { text-align: left; }
+}
+
+/* ---------- PRINT / PDF ---------- */
+.la-pdf { display: none; }
+@media print {
+  @page { size: A4 portrait; margin: 0; }
+  html, body { margin: 0 !important; padding: 0 !important; background: #fff !important; }
+  body.la-print > * { display: none !important; }
+  body.la-print > .la-pdf.is-print { display: flex !important; }
+  .la-pdf {
+    flex-direction: column;
+    box-sizing: border-box;
+    width: 210mm; min-height: 297mm;
+    padding: 20mm 18mm 16mm;
+    background: #fff;
+    color: #060606;
+    font-family: 'Space Mono', monospace;
+    font-size: 11pt;
+    line-height: 1.55;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .la-pdf * { box-sizing: border-box; }
+  .la-pdf-cab {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24pt;
+    padding-bottom: 9pt;
+    margin-bottom: 20pt;
+    border-bottom: 2pt solid #06FF23;
+  }
+  .la-pdf-brand { display: flex; align-items: center; gap: 12pt; }
+  .la-pdf-logo {
+    width: 36pt; height: 36pt;
+    border: 2pt solid #06FF23;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
+    font-size: 14pt;
+    color: #06FF23;
+  }
+  .la-pdf-brand-text { line-height: 1.1; }
+  .la-pdf-brand-text strong {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
+    font-size: 11pt;
+    letter-spacing: 2pt;
+    display: block;
+  }
+  .la-pdf-brand-text span {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 7pt;
+    letter-spacing: 1.5pt;
+    color: #06FF23;
+    text-transform: uppercase;
+  }
+  .la-pdf-meta { text-align: right; }
+  .la-pdf-meta > div { display: flex; justify-content: flex-end; gap: 8pt; }
+  .la-pdf-meta dt {
+    font-size: 8pt;
+    font-family: 'Share Tech Mono', monospace;
+    letter-spacing: 1.5pt;
+    text-transform: uppercase;
+    color: #6B7075;
+  }
+  .la-pdf-meta dd { font-size: 10pt; font-weight: 700; margin: 0; }
+  .la-pdf-proyecto {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 16pt;
+    font-weight: 700;
+    margin-bottom: 16pt;
+  }
+  .la-pdf-partes { display: flex; gap: 56pt; margin-bottom: 20pt; }
+  .la-pdf-partes dt {
+    font-size: 7.5pt;
+    font-family: 'Share Tech Mono', monospace;
+    letter-spacing: 1.5pt;
+    text-transform: uppercase;
+    color: #6B7075;
+    margin-bottom: 2pt;
+  }
+  .la-pdf-partes dd { font-size: 12pt; font-weight: 700; margin: 0; }
+  .la-pdf-bloque { margin-bottom: 18pt; page-break-inside: avoid; }
+  .la-pdf-bloque h4 {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 8pt;
+    letter-spacing: 2pt;
+    text-transform: uppercase;
+    color: #06FF23;
+    margin: 0 0 8pt;
+    padding-bottom: 4pt;
+    border-bottom: 0.5pt solid #d5d2da;
+  }
+  .la-pdf-bloque ul { margin: 0; padding: 0; list-style: none; }
+  .la-pdf-bloque li {
+    padding: 3.5pt 0 3.5pt 12pt;
+    position: relative;
+    font-size: 10.5pt;
+  }
+  .la-pdf-bloque li::before {
+    content: '';
+    position: absolute;
+    left: 2pt; top: 9.5pt;
+    width: 3pt; height: 3pt;
+    border-radius: 50%;
+    background: #06FF23;
+  }
+  .la-pdf-cond > div {
+    display: flex;
+    gap: 14pt;
+    padding: 4.5pt 0;
+    border-bottom: 0.5pt solid #eceaef;
+  }
+  .la-pdf-cond > div:last-child { border-bottom: none; }
+  .la-pdf-cond dt {
+    flex: 0 0 32%;
+    font-size: 9.5pt;
+    font-family: 'Share Tech Mono', monospace;
+    color: #6B7075;
+  }
+  .la-pdf-cond dd { flex: 1 1 auto; font-size: 10.5pt; margin: 0; }
+  .la-pdf-inversion {
+    margin-top: auto;
+    padding: 14pt 0;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 20pt;
+    border-top: 2pt solid #06FF23;
+    border-bottom: 2pt solid #06FF23;
+  }
+  .la-pdf-inversion span {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9pt;
+    letter-spacing: 2pt;
+    text-transform: uppercase;
+    color: #6B7075;
+  }
+  .la-pdf-inversion strong {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 20pt;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+    color: #06FF23;
+  }
+  .la-pdf-cierre {
+    margin: 14pt 0 0;
+    font-size: 10.5pt;
+  }
+  .la-pdf-sig {
+    margin-top: 24pt;
+    text-align: center;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 8pt;
+    letter-spacing: 2pt;
+    text-transform: uppercase;
+    color: #06FF23;
+  }
+}
+</style>
+</head>
+<body>
+<div class="la-root">
+<div class="la-wrap">
+
+<!-- HEADER -->
+<header class="la-header">
+  <div class="la-brand">
+    <div class="la-logo" aria-hidden="true">LA</div>
+    <div class="la-brand-text">
+      <strong>LOST ASTRONAUTA</strong>
+      <span>Industrias Creativas · Est. 2001</span>
+    </div>
+  </div>
+  <div class="la-hud">
+    <div>STATUS: <span class="ok">● ACTIVO</span></div>
+    <div>FREQ: ROCK PROTÓNICO</div>
+    <div>MISIÓN: PRESUPUESTO</div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="la-hero">
+  <span class="la-kicker">Calculadora de Presupuestos · v1.0</span>
+  <h1 class="la-h1">Hagamos números, <span class="accent">tripulante</span></h1>
+  <p>La pregunta que más nos hacen en la nave. Herramienta para diseñadores, músicos, artistas, asesores y cualquiera que cobre por su trabajo creativo. Saludos Protónicos.</p>
+</section>
+
+<!-- NIVELES -->
+<p class="la-levels-lead">// Seleccioná tu modo de operación</p>
+<div class="la-levels" role="tablist">
+  <button type="button" class="la-level is-active" data-level="1" role="tab" aria-selected="true">
+    <span class="la-level-num">01 · DESPEGUE</span>
+    <span class="la-level-name">Estoy empezando</span>
+    <span class="la-level-desc">Quiero una idea de cuánto presupuestar mi primer proyecto.</span>
+  </button>
+  <button type="button" class="la-level" data-level="2" role="tab" aria-selected="false">
+    <span class="la-level-num">02 · ÓRBITA ESTABLE</span>
+    <span class="la-level-name">Esto es mi laburo</span>
+    <span class="la-level-desc">Vivo de esto. Tengo que cubrir costos, software y tiempo real.</span>
+  </button>
+  <button type="button" class="la-level" data-level="3" role="tab" aria-selected="false">
+    <span class="la-level-num">03 · FLOTA ESTELAR</span>
+    <span class="la-level-name">Tengo que delegar</span>
+    <span class="la-level-name">Coordinó camaradas que también cobran. Necesito margen.</span>
+  </button>
+</div>
+<div class="la-levelhint" data-o="levelhint"></div>
+
+<!-- GRID -->
+<div class="la-grid">
+
+  <!-- COLUMNA IZQUIERDA -->
+  <div class="la-col-main">
+
+    <!-- PASO 1: valor hora -->
+    <section class="la-card" data-card>
+      <div class="la-card-head">
+        <span class="la-step">01</span>
+        <h3>Cuánto vale tu hora</h3>
+      </div>
+      <p class="la-card-sub">Todo sale de acá. Primero tu tiempo, después el cliente.</p>
+
+      <div class="la-field">
+        <label class="la-label" for="la-moneda">En qué moneda cobrás</label>
+        <span class="la-help">La moneda en la que te van a pagar. Si la cambiás, los montos se convierten solos.</span>
+        <select id="la-moneda" data-f="moneda">
+          <option value="USD">USD — Dólar</option>
+          <option value="CLP" selected>CLP — Peso chileno</option>
+          <option value="ARS">ARS — Peso argentino</option>
+          <option value="EUR">EUR — Euro</option>
+          <option value="MXN">MXN — Peso mexicano</option>
+          <option value="COP">COP — Peso colombiano</option>
+          <option value="PEN">PEN — Sol peruano</option>
+          <option value="UYU">UYU — Peso uruguayo</option>
+          <option value="BOB">BOB — Boliviano</option>
+          <option value="PYG">PYG — Guaraní</option>
+          <option value="BRL">BRL — Real brasileño</option>
+          <option value="CRC">CRC — Colón costarricense</option>
+          <option value="GTQ">GTQ — Quetzal</option>
+          <option value="DOP">DOP — Peso dominicano</option>
+          <option value="VES">VES — Bolívar</option>
+        </select>
+        <span class="la-help" data-o="cambio" style="margin-top:8px;margin-bottom:0;color:var(--la-green);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:1px;"></span>
+      </div>
+
+      <div class="la-row">
+        <div class="la-field">
+          <label class="la-label" for="la-sueldo">Cuánto querés ganar por mes</label>
+          <span class="la-help">Alquiler, comida, servicios, software y algo para ahorrar.</span>
+          <div class="la-input-wrap">
+            <span class="la-prefix" data-sym>$</span>
+            <input type="text" id="la-sueldo" data-f="sueldo" data-money class="has-prefix" inputmode="numeric" autocomplete="off" placeholder="0">
+          </div>
+        </div>
+        <div class="la-field">
+          <label class="la-label" for="la-horasdia">Horas por día</label>
+          <span class="la-help">Tu jornada, de lunes a viernes. Contamos 20 días al mes.</span>
+          <div class="la-input-wrap">
+            <input type="number" id="la-horasdia" data-f="horasdia" class="has-suffix" min="1" max="24" step="any" inputmode="decimal" value="8">
+            <span class="la-suffix">hs/día</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="la-readout">
+        <div>
+          <span class="la-readout-label">Tu valor hora</span>
+          <span class="la-readout-sub" data-o="valorhora-detalle">Poné cuánto querés ganar.</span>
+        </div>
+        <span class="la-readout-val" data-o="valorhora">—</span>
+      </div>
+    </section>
+
+    <!-- PASO 2: tiempo -->
+    <section class="la-card" data-card>
+      <div class="la-card-head">
+        <span class="la-step">02</span>
+        <h3>Cuánto tiempo lleva</h3>
+      </div>
+      <p class="la-card-sub">El tiempo real, no el optimista. Sumá las idas y vueltas.</p>
+
+      <!-- Nivel 1 -->
+      <div data-lvl="1">
+        <div class="la-field">
+          <label class="la-label" for="la-horastotal">Horas totales del proyecto</label>
+          <span class="la-help">De punta a punta: pensarlo, hacerlo, corregirlo y entregarlo.</span>
+          <div class="la-input-wrap">
+            <input type="number" id="la-horastotal" data-f="horastotal" class="has-suffix" min="0" step="any" inputmode="decimal" value="20">
+            <span class="la-suffix">horas</span>
+          </div>
+        </div>
+        <div class="la-note">
+          <strong>Para orientarte:</strong> un logo 8–15 hs · una asesoría estratégica 4–8 hs · un disco/EP 40–100 hs · una ilustración compleja 10–20 hs · una pieza de diseño editorial 15–30 hs.
+        </div>
+      </div>
+
+      <!-- Nivel 2 y 3 -->
+      <div class="la-hide" data-lvl="2 3">
+        <div class="la-row-3">
+          <div class="la-field">
+            <label class="la-label" for="la-h-investigacion">Investigación / Concepto</label>
+            <span class="la-help">Brief, benchmark, idea, dirección.</span>
+            <div class="la-input-wrap">
+              <input type="number" id="la-h-investigacion" data-f="h-investigacion" class="has-suffix" min="0" step="any" inputmode="decimal" value="4">
+              <span class="la-suffix">hs</span>
+            </div>
+          </div>
+          <div class="la-field">
+            <label class="la-label" for="la-h-produccion">Diseño / Producción</label>
+            <span class="la-help">La ejecución creativa en sí.</span>
+            <div class="la-input-wrap">
+              <input type="number" id="la-h-produccion" data-f="h-produccion" class="has-suffix" min="0" step="any" inputmode="decimal" value="12">
+              <span class="la-suffix">hs</span>
+            </div>
+          </div>
+          <div class="la-field">
+            <label class="la-label" for="la-h-revisiones">Revisiones</label>
+            <span class="la-help">Idas y vueltas con el cliente.</span>
+            <div class="la-input-wrap">
+              <input type="number" id="la-h-revisiones" data-f="h-revisiones" class="has-suffix" min="0" step="any" inputmode="decimal" value="3">
+              <span class="la-suffix">hs</span>
+            </div>
+          </div>
+          <div class="la-field">
+            <label class="la-label" for="la-h-gestion">Gestión / Comunicación</label>
+            <span class="la-help">Reuniones, mails, coordinar.</span>
+            <div class="la-input-wrap">
+              <input type="number" id="la-h-gestion" data-f="h-gestion" class="has-suffix" min="0" step="any" inputmode="decimal" value="2">
+              <span class="la-suffix">hs</span>
+            </div>
+          </div>
+          <div class="la-field">
+            <label class="la-label" for="la-h-entrega">Entrega / Archivado</label>
+            <span class="la-help">Exportar, organizar, mandar archivos.</span>
+            <div class="la-input-wrap">
+              <input type="number" id="la-h-entrega" data-f="h-entrega" class="has-suffix" min="0" step="any" inputmode="decimal" value="1">
+              <span class="la-suffix">hs</span>
+            </div>
+          </div>
+          <div class="la-readout" style="align-items:flex-start;">
+            <div>
+              <span class="la-readout-label">Total</span>
+              <span class="la-readout-sub" data-o="horas-total-detalle">Por pieza.</span>
+            </div>
+            <span class="la-readout-val" data-o="horas-total">—</span>
+          </div>
+        </div>
+        <div class="la-note">
+          <strong>Multiplicadores por tarea:</strong> investigación ×1.3 · diseño/producción ×1.5 · resto ×1. Podés editarlos tocando el número.
+        </div>
+      </div>
+    </section>
+
+    <!-- PASO 3: cantidad y extras -->
+    <section class="la-card la-hide" data-card data-lvl="2 3">
+      <div class="la-card-head">
+        <span class="la-step">03</span>
+        <h3>Cantidad y extras</h3>
+      </div>
+      <p class="la-card-sub">Todo lo que se repite o se agrega.</p>
+      <div class="la-row">
+        <div class="la-field">
+          <label class="la-label" for="la-cantidad">Cantidad de piezas</label>
+          <span class="la-help">Si es un pack. El descuento por volumen se aplica solo.</span>
+          <div class="la-input-wrap">
+            <input type="number" id="la-cantidad" data-f="cantidad" class="has-suffix" min="1" step="1" inputmode="numeric" value="1">
+            <span class="la-suffix">piezas</span>
+          </div>
+        </div>
+        <div class="la-field">
+          <label class="la-label" for="la-rondas">Rondas de corrección incluidas</label>
+          <span class="la-help">Ponelo por escrito. Dos es lo estándar.</span>
+          <div class="la-input-wrap">
+            <input type="number" id="la-rondas" data-f="rondas" class="has-suffix" min="0" step="1" inputmode="numeric" value="2">
+            <span class="la-suffix">rondas</span>
+          </div>
+        </div>
+      </div>
+      <div class="la-row">
+        <div class="la-field">
+          <label class="la-label" for="la-viaticos">Viáticos / costos directos</label>
+          <span class="la-help">Materiales, viajes, licencias específicas. Total, no por hora.</span>
+          <div class="la-input-wrap">
+            <span class="la-prefix" data-sym>$</span>
+            <input type="text" id="la-viaticos" data-f="viaticos" data-money class="has-prefix" inputmode="numeric" autocomplete="off" value="0">
+          </div>
+        </div>
+        <div class="la-field">
+          <label class="la-label" for="la-pctronda">Cada ronda extra cuesta</label>
+          <span class="la-help">Va escrito en el presupuesto. Frena los cambios infinitos.</span>
+          <div class="la-input-wrap">
+            <input type="number" id="la-pctronda" data-f="pctronda" class="has-suffix" min="0" step="1" inputmode="numeric" value="10">
+            <span class="la-suffix">%</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PASO 4: colaboradores -->
+    <section class="la-card la-hide" data-card data-lvl="3">
+      <div class="la-card-head">
+        <span class="la-step">04</span>
+        <h3>Quién más labura acá</h3>
+      </div>
+      <p class="la-card-sub">Lo que le pagás a cada camarada. Poné el rol y el monto.</p>
+      <div class="la-colabs" data-o="colabs"></div>
+      <button type="button" class="la-btn la-btn-ghost" data-o="colab-add" style="padding:11px 18px;font-size:11px;">+ Agregar camarada</button>
+      <div class="la-readout" style="margin-top:18px;">
+        <div>
+          <span class="la-readout-label">Le pagás al equipo</span>
+          <span class="la-readout-sub" data-o="colabs-detalle">Todavía no cargaste a nadie.</span>
+        </div>
+        <span class="la-readout-val" data-o="colabs-total">—</span>
+      </div>
+      <div class="la-note">
+        <strong>Esto no es tu ganancia.</strong> Lo que te cobran ellos es un costo. Tu ganancia sale del margen que le sumás abajo.
+      </div>
+    </section>
+
+    <!-- PASO 5: costos -->
+    <section class="la-card la-hide" data-card data-lvl="2 3">
+      <div class="la-card-head">
+        <span class="la-step">05</span>
+        <h3>Los costos que nadie cobra</h3>
+      </div>
+      <p class="la-card-sub">Tu compu, tu software, tu internet. Si no los repartís, los pagás vos.</p>
+      <div class="la-row-3">
+        <div class="la-field">
+          <label class="la-label" for="la-equipo">Valor de tu equipo</label>
+          <span class="la-help">Compu, tablet, instrumentos, herramientas. Todo junto.</span>
+          <div class="la-input-wrap">
+            <span class="la-prefix" data-sym>$</span>
+            <input type="text" id="la-equipo" data-f="equipo" data-money class="has-prefix" inputmode="numeric" autocomplete="off" value="0">
+          </div>
+        </div>
+        <div class="la-field">
+          <label class="la-label" for="la-vidautil">Años de vida útil</label>
+          <span class="la-help">En cuántos años lo renovás. Cuatro es realista.</span>
+          <div class="la-input-wrap">
+            <input type="number" id="la-vidautil" data-f="vidautil" class="has-suffix" min="1" step="any" inputmode="decimal" value="4">
+            <span class="la-suffix">años</span>
+          </div>
+        </div>
+        <div class="la-field">
+          <label class="la-label" for="la-trabajosanio">Trabajos por año</label>
+          <span class="la-help">Cuántos proyectos como este hacés al año.</span>
+          <div class="la-input-wrap">
+            <input type="number" id="la-trabajosanio" data-f="trabajosanio" class="has-suffix" min="1" step="1" inputmode="numeric" value="40">
+            <span class="la-suffix">trabajos</span>
+          </div>
+        </div>
+      </div>
+      <div class="la-row">
+        <div class="la-field">
+          <label class="la-label" for="la-fijos">Gastos fijos del mes</label>
+          <span class="la-help">Adobe, Spotify, internet, estudio, plugins.</span>
+          <div class="la-input-wrap">
+            <span class="la-prefix" data-sym>$</span>
+            <input type="text" id="la-fijos" data-f="fijos" data-money class="has-prefix" inputmode="numeric" autocomplete="off" value="0">
+          </div>
+        </div>
+        <div class="la-field">
+          <label class="la-label" for="la-trabajosmes">Trabajos por mes</label>
+          <span class="la-help">Para repartir esos gastos.</span>
+          <div class="la-input-wrap">
+            <input type="number" id="la-trabajosmes" data-f="trabajosmes" class="has-suffix" min="1" step="1" inputmode="numeric" value="4">
+            <span class="la-suffix">trabajos</span>
+          </div>
+        </div>
+      </div>
+      <div class="la-row" style="margin-top:4px;">
+        <div class="la-field">
+          <label class="la-label" for="la-impuestos">Impuestos</label>
+          <span class="la-help">Lo que se lleva el fisco.</span>
+          <div class="la-input-wrap" style="max-width:220px;">
+            <input type="number" id="la-impuestos" data-f="impuestos" class="has-suffix" min="0" max="90" step="any" inputmode="decimal" value="0">
+            <span class="la-suffix">%</span>
+          </div>
+        </div>
+        <div class="la-field">
+          <label class="la-label" for="la-comision">Comisiones de cobro</label>
+          <span class="la-help">Pasarela, transferencia internacional, banco.</span>
+          <div class="la-input-wrap" style="max-width:220px;">
+            <input type="number" id="la-comision" data-f="comision" class="has-suffix" min="0" max="90" step="any" inputmode="decimal" value="0">
+            <span class="la-suffix">%</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PASO 6: contexto -->
+    <section class="la-card" data-card>
+      <div class="la-card-head">
+        <span class="la-step">06</span>
+        <h3>El cliente y el contexto</h3>
+      </div>
+      <p class="la-card-sub">El mismo laburo no vale lo mismo para todos. Acá es donde la mayoría deja guita arriba de la mesa.</p>
+      <div class="la-toggles" data-o="toggles"></div>
+      <div class="la-factor" data-o="factor-resumen"></div>
+    </section>
+
+    <!-- PASO 7: margen -->
+    <section class="la-card la-hide" data-card data-lvl="3">
+      <div class="la-card-head">
+        <span class="la-step">07</span>
+        <h3>Tu margen</h3>
+      </div>
+      <p class="la-card-sub">Si tu equipo se lleva todo, trabajaste gratis por coordinar.</p>
+      <div class="la-field">
+        <label class="la-label" for="la-margen">Qué margen le sumás</label>
+        <span class="la-help">Entre 20% y 40%. Es lo que te queda por armar el proyecto y responder si algo sale mal.</span>
+        <div class="la-input-wrap" style="max-width:220px;">
+          <input type="number" id="la-margen" data-f="margen" class="has-suffix" min="0" max="200" step="1" inputmode="numeric" value="25">
+          <span class="la-suffix">%</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- PASO 8: datos PDF -->
+    <section class="la-card" data-card>
+      <div class="la-card-head">
+        <span class="la-step">08</span>
+        <h3>Los datos de la propuesta</h3>
+      </div>
+      <p class="la-card-sub">Sólo para el PDF. Si no los ponés, el presupuesto sale igual pero sin nombres.</p>
+      <div class="la-row">
+        <div class="la-field">
+          <label class="la-label" for="la-autor">Tu nombre / estudio</label>
+          <input type="text" id="la-autor" data-f="autor" autocomplete="off" placeholder="Lost Astronauta">
+        </div>
+        <div class="la-field">
+          <label class="la-label" for="la-cliente">Nombre del cliente</label>
+          <input type="text" id="la-cliente" data-f="cliente" autocomplete="off" placeholder="Marca / Persona">
+        </div>
+      </div>
+      <div class="la-field">
+        <label class="la-label" for="la-proyecto">Nombre del proyecto</label>
+        <input type="text" id="la-proyecto" data-f="proyecto" autocomplete="off" placeholder="Identidad visual / Disco / Asesoría">
+      </div>
+    </section>
+
+  </div>
+
+  <!-- COLUMNA DERECHA: RESULTADO -->
+  <div class="la-result-col">
+    <div class="la-result">
+      <div class="la-result-kicker">// Precio recomendado</div>
+      <div class="la-price" data-o="precio" aria-live="polite">—</div>
+      <div class="la-price-note" data-o="nota">Poné cuánto querés ganar por mes y arrancamos.</div>
+
+      <div class="la-rango">
+        <div>
+          <span class="la-rango-lbl">Tu piso</span>
+          <span class="la-rango-val" data-o="piso">—</span>
+          <span class="la-rango-hint">Abajo de acá, ponés plata vos</span>
+        </div>
+        <div>
+          <span class="la-rango-lbl">Si te sobra laburo</span>
+          <span class="la-rango-val" data-o="techo">—</span>
+          <span class="la-rango-hint">Pedí esto con confianza</span>
+        </div>
+      </div>
+
+      <div class="la-break">
+        <div class="la-break-title">// Cómo se arma</div>
+        <div data-o="break-rows"></div>
+      </div>
+
+      <div class="la-actions">
+        <button type="button" class="la-btn la-btn-primary" data-o="copy-cliente">Copiar presupuesto</button>
+        <button type="button" class="la-btn la-btn-ghost" data-o="pdf">Descargar PDF</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="la-foot">
+  <div>Herramienta para tripulantes de industrias creativas</div>
+  <div style="margin-top:6px;">Hecha por <strong>Lost Astronauta</strong> · lostastronauta.org · Est. 2001</div>
+  <div class="la-foot-sig">🖖 Saludos Protónicos y Energías Siderales</div>
+</footer>
+
+</div>
+</div>
+
+<div class="la-toast" data-o="toast" role="status" aria-live="polite"></div>
+<div class="la-pdf" data-o="pdf-hoja" aria-hidden="true"></div>
+
+<script>
+/* ============================================================
+   LOST ASTRONAUTA · Calculadora de Presupuestos
+   Vanilla JS · Sin dependencias
+   ============================================================ */
+(function () {
+'use strict';
+
+const CFG = {
+  moneda: 'CLP',
+  monedas: [
+    {c:'USD', s:'US$', n:'Dólar', loc:'en-US', dec:2, usd:1},
+    {c:'CLP', s:'$', n:'Peso chileno', loc:'es-CL', dec:0, usd:934},
+    {c:'ARS', s:'$', n:'Peso argentino', loc:'es-AR', dec:0, usd:1510},
+    {c:'EUR', s:'€', n:'Euro', loc:'es-ES', dec:2, usd:0.86},
+    {c:'MXN', s:'$', n:'Peso mexicano', loc:'es-MX', dec:0, usd:16.9},
+    {c:'COP', s:'$', n:'Peso colombiano', loc:'es-CO', dec:0, usd:3127},
+    {c:'PEN', s:'S/', n:'Sol peruano', loc:'es-PE', dec:2, usd:3.35},
+    {c:'UYU', s:'$U', n:'Peso uruguayo', loc:'es-UY', dec:0, usd:40.2},
+    {c:'BOB', s:'Bs', n:'Boliviano', loc:'es-BO', dec:2, usd:12.4},
+    {c:'PYG', s:'₲', n:'Guaraní', loc:'es-PY', dec:0, usd:5948},
+    {c:'BRL', s:'R$', n:'Real brasileño', loc:'pt-BR', dec:2, usd:5.1},
+    {c:'CRC', s:'₡', n:'Colón', loc:'es-CR', dec:0, usd:453},
+    {c:'GTQ', s:'Q', n:'Quetzal', loc:'es-GT', dec:2, usd:7.6},
+    {c:'DOP', s:'RD$', n:'Peso dominicano', loc:'es-DO', dec:0, usd:59.2},
+    {c:'VES', s:'Bs', n:'Bolívar', loc:'es-VE', dec:2, usd:820}
+  ],
+  factores: [
+    {id:'portfolio', q:'¿Es para tu portfolio?', por:'Lo que podés mostrar te trae más clientes. Lo que no se ve, te lo tienen que pagar mejor.', on:{t:'Sí, lo voy a mostrar', m:1}, off:{t:'No, es un laburo invisible', m:1.15}},
+    {id:'internacional', q:'¿Cliente internacional?', por:'Paga en divisa, husos horarios distintos, contexto cultural que entender. Se cobra.', on:{t:'Sí, del extranjero', m:1.3}, off:{t:'No, local', m:1}},
+    {id:'usocomercial', q:'¿Uso comercial amplio?', por:'Si va a pauta, packaging masivo o una campaña grande, tu trabajo se multiplica. Cobrá esa multiplicación.', on:{t:'Sí, uso masivo', m:1.4}, off:{t:'No, uso limitado', m:1}},
+    {id:'urgente', q:'¿Te lo pide urgente?', por:'La urgencia la paga el que la genera. Si tenés que trasnochar, eso se cobra.', on:{t:'Sí, para ayer', m:1.3}, off:{t:'No, hay tiempo', m:1}},
+    {id:'seco', q:'¿Estás sin proyectos ahora?', por:'El único que baja el precio. A veces conviene entrar, pero que sea la excepción.', on:{t:'Necesito este laburo', m:0.85}, off:{t:'Tengo clientes', m:1.1}},
+    {id:'recurrente', q:'¿Te da laburo recurrente?', por:'Conseguir un cliente cuesta tiempo. El que vuelve todos los meses ya te ahorró eso.', on:{t:'Sí, va a ser recurrente', m:1}, off:{t:'No, es por esta vez', m:1.15}},
+    {id:'correcciones', q:'¿Pide muchas correcciones?', por:'Si ya sabés que van a ser diez idas y vueltas, cobralas de entrada.', on:{t:'Sí, se vienen mil vueltas', m:1.2}, off:{t:'No, aprueba rápido', m:1}}
+  ],
+  niveles: {
+    '1': {nombre:'Despegue', hint:'<strong>01 · DESPEGUE.</strong> Lo mínimo: cuánto querés ganar, cuánto tarda y quién es el cliente. Con eso salís del "no sé qué cobrar".'},
+    '2': {nombre:'Órbita estable', hint:'<strong>02 · ÓRBITA ESTABLE.</strong> Se abren las tareas por separado, los packs, y lo que hace que esto sea un negocio: equipo, gastos fijos e impuestos.'},
+    '3': {nombre:'Flota estelar', hint:'<strong>03 · FLOTA ESTELAR.</strong> Sumás lo que te cobra cada camarada y le ponés tu margen arriba. Tu ganancia no puede ser el trabajo de ellos.'}
+  },
+  mult: {
+    'h-investigacion': 1.3,
+    'h-produccion': 1.5,
+    'h-revisiones': 1,
+    'h-gestion': 1,
+    'h-entrega': 1
+  },
+  api: 'https://open.er-api.com/v6/latest/USD'
+};
+
+const DIAS_MES = 20;
+const CLAVE = 'la_presupuesto_v1';
+
+function f(n) { return document.querySelector('[data-f="'+n+'"]'); }
+function o(n) { return document.querySelector('[data-o="'+n+'"]'); }
+function todos(s) { return Array.prototype.slice.call(document.querySelectorAll(s)); }
+
+function num(n, def) {
+  var el = f(n);
+  if (!el) return def || 0;
+  var v = el.hasAttribute('data-money') ? desformatear(el.value) : parseFloat(el.value);
+  return (isNaN(v) || v < 0) ? (def || 0) : v;
+}
+
+const state = {
+  nivel: 1,
+  toggles: {},
+  colabs: []
+};
+
+CFG.factores.forEach(t => {
+  state.toggles[t.id] = (t.id === 'portfolio' || t.id === 'recurrente');
+});
+
+const TASAS = {};
+CFG.monedas.forEach(m => { TASAS[m.c] = m.usd || 1; });
+let FECHA_TASAS = '';
+
+function buscarMoneda(code) {
+  for (let i = 0; i < CFG.monedas.length; i++) {
+    if (CFG.monedas[i].c === code) return CFG.monedas[i];
+  }
+  return CFG.monedas[0];
+}
+function moneda() {
+  const sel = f('moneda');
+  return buscarMoneda(sel ? sel.value : CFG.moneda);
+}
+
+function fmt(v) {
+  const m = moneda();
+  if (!isFinite(v)) v = 0;
+  let s;
+  try {
+    s = new Intl.NumberFormat(m.loc, { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(v);
+  } catch(e) { s = String(Math.round(v)); }
+  return m.s + ' ' + s;
+}
+
+function pct(v) { return (Math.round(v*10)/10).toString().replace('.',',') + '%'; }
+function mult(v) { return '×' + (Math.round(v*100)/100).toString().replace('.',','); }
+function horasTxt(h) {
+  const n = Math.round(h*10)/10;
+  return n.toString().replace('.',',');
+}
+
+/* ---- Formato de campos de plata ---- */
+function separadores(code) {
+  const m = code ? buscarMoneda(code) : moneda();
+  const s = { grupo: '.', decimal: ',' };
+  try {
+    new Intl.NumberFormat(m.loc).formatToParts(12345.6).forEach(p => {
+      if (p.type === 'group') s.grupo = p.value;
+      if (p.type === 'decimal') s.decimal = p.value;
+    });
+  } catch(e) {}
+  return s;
+}
+function desformatear(txt, code) {
+  if (typeof txt !== 'string') return NaN;
+  const sep = separadores(code);
+  let limpio = '', hayDec = false;
+  for (let i = 0; i < txt.length; i++) {
+    const ch = txt.charAt(i);
+    if (ch >= '0' && ch <= '9') limpio += ch;
+    else if (ch === sep.decimal && !hayDec && limpio !== '') { limpio += '.'; hayDec = true; }
+  }
+  if (limpio === '' || limpio === '.') return NaN;
+  return parseFloat(limpio);
+}
+function agrupar(digitos, grupo) {
+  let salida = '';
+  const n = digitos.length;
+  for (let i = 0; i < n; i++) {
+    if (i > 0 && (n - i) % 3 === 0) salida += grupo;
+    salida += digitos.charAt(i);
+  }
+  return salida;
+}
+function formatearNumero(v) {
+  if (!isFinite(v)) return '';
+  const sep = separadores();
+  const partes = Math.abs(v).toFixed(moneda().dec || 0).split('.');
+  return agrupar(partes[0], sep.grupo) + (partes[1] ? sep.decimal + partes[1] : '');
+}
+function formatearCampo(inp) {
+  const sep = separadores();
+  const dec = moneda().dec || 0;
+  let caret = inp.selectionStart;
+  if (caret == null) caret = inp.value.length;
+  const antes = inp.value.slice(0, caret);
+  const digitosAntes = (antes.match(/\d/g) || []).length;
+  const veniaDelDecimal = antes.charAt(antes.length - 1) === sep.decimal;
+  let entero = '', decimales = null;
+  for (let i = 0; i < inp.value.length; i++) {
+    const ch = inp.value.charAt(i);
+    if (ch >= '0' && ch <= '9') {
+      if (decimales === null) entero += ch;
+      else if (decimales.length < dec) decimales += ch;
+    } else if (ch === sep.decimal && decimales === null && dec > 0) {
+      decimales = '';
+    }
+  }
+  entero = entero.replace(/^0+(?=\d)/, '');
+  let nuevo = (entero === '') ? '' : agrupar(entero, sep.grupo);
+  if (decimales !== null) nuevo += sep.decimal + decimales;
+  if (nuevo === inp.value) return;
+  inp.value = nuevo;
+  let pos = 0, contados = 0;
+  while (pos < nuevo.length && contados < digitosAntes) {
+    const c = nuevo.charAt(pos);
+    if (c >= '0' && c <= '9') contados++;
+    pos++;
+  }
+  if (veniaDelDecimal && nuevo.charAt(pos) === sep.decimal) pos++;
+  try { inp.setSelectionRange(pos, pos); } catch(e) {}
+}
+
+function convertir(valor, desde, hacia) {
+  const a = TASAS[desde], b = TASAS[hacia];
+  if (!isFinite(valor) || !a || !b) return valor;
+  return valor / a * b;
+}
+function formatearTasa(v) {
+  const sep = separadores();
+  const dec = (v < 10) ? 4 : ((v < 1000) ? 2 : 0);
+  const partes = v.toFixed(dec).split('.');
+  return agrupar(partes[0], sep.grupo) + (partes[1] ? sep.decimal + partes[1] : '');
+}
+
+function actualizarTasas() {
+  if (typeof fetch !== 'function') return;
+  const ctrl = (typeof AbortController === 'function') ? new AbortController() : null;
+  const corte = ctrl ? setTimeout(() => ctrl.abort(), 6000) : null;
+  fetch(CFG.api, ctrl ? { signal: ctrl.signal } : undefined)
+    .then(r => r.ok ? r.json() : null)
+    .then(d => {
+      if (corte) clearTimeout(corte);
+      if (!d || !d.rates) return;
+      let cambiadas = 0;
+      CFG.monedas.forEach(m => {
+        const v = d.rates[m.c];
+        if (typeof v === 'number' && isFinite(v) && v > 0) {
+          TASAS[m.c] = v;
+          cambiadas++;
+        }
+      });
+      if (cambiadas) {
+        try { FECHA_TASAS = new Date().toLocaleDateString('es-CL'); } catch(e) {}
+      }
+      pintarCambio();
+    })
+    .catch(() => { if (corte) clearTimeout(corte); });
+}
+
+function pintarCambio() {
+  const el = o('cambio');
+  if (!el) return;
+  const m = moneda();
+  if (m.c === 'USD' || !TASAS[m.c] || TASAS[m.c] === 1) { el.textContent = ''; return; }
+  el.textContent = '> US$ 1 = ' + formatearTasa(TASAS[m.c]) + ' ' + m.c + (FECHA_TASAS ? ' · ' + FECHA_TASAS : '');
+}
+
+function niceRound(n) {
+  if (!isFinite(n) || n <= 0) return 0;
+  const mag = Math.pow(10, Math.floor(Math.log10(n)) - 2);
+  if (mag < 1) return Math.ceil(n);
+  return Math.ceil(n / mag) * mag;
+}
+
+function descuentoVolumen(q) {
+  if (q < 2) return 0;
+  return Math.min(25, (q - 1) * 5);
+}
+
+/* ---- Toggles ---- */
+(function pintarTogglesHTML() {
+  const wrap = o('toggles');
+  if (!wrap) return;
+  CFG.factores.forEach(t => {
+    const caja = document.createElement('div');
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'la-toggle';
+    b.setAttribute('data-tg', t.id);
+    b.innerHTML =
+      '<span class="la-switch"></span>' +
+      '<span class="la-toggle-body">' +
+        '<span class="la-toggle-q"></span>' +
+        '<span class="la-toggle-a" data-ans></span>' +
+      '</span>' +
+      '<span class="la-badge" data-bdg></span>';
+    b.querySelector('.la-toggle-q').textContent = t.q;
+    b.addEventListener('click', () => {
+      state.toggles[t.id] = !state.toggles[t.id];
+      pintarToggles();
+      update();
+    });
+    caja.appendChild(b);
+    wrap.appendChild(caja);
+  });
+})();
+
+function pintarToggles() {
+  CFG.factores.forEach(t => {
+    const el = document.querySelector('[data-tg="'+t.id+'"]');
+    if (!el) return;
+    const on = !!state.toggles[t.id];
+    const lado = on ? t.on : t.off;
+    el.classList.toggle('is-on', on);
+    el.querySelector('[data-ans]').textContent = lado.t;
+    const b = el.querySelector('[data-bdg]');
+    if (lado.m > 1.001) { b.className = 'la-badge up'; b.textContent = '+' + Math.round((lado.m - 1) * 100) + '%'; }
+    else if (lado.m < 0.999) { b.className = 'la-badge down'; b.textContent = '−' + Math.round((1 - lado.m) * 100) + '%'; }
+    else { b.className = 'la-badge flat'; b.textContent = 'igual'; }
+  });
+}
+
+function factorContexto() {
+  let r = 1;
+  CFG.factores.forEach(t => { r *= (state.toggles[t.id] ? t.on.m : t.off.m); });
+  return r;
+}
+
+/* ---- Colaboradores ---- */
+function totalColabs() {
+  let t = 0;
+  state.colabs.forEach(c => {
+    const v = desformatear(c.monto || '');
+    if (!isNaN(v) && v > 0) t += v;
+  });
+  return t;
+}
+function pintarColabs() {
+  const wrap = o('colabs');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  state.colabs.forEach((c, i) => {
+    const fila = document.createElement('div');
+    fila.style.cssText = 'display:flex;gap:10px;margin-bottom:10px;align-items:center;';
+    const rol = document.createElement('input');
+    rol.type = 'text';
+    rol.placeholder = 'Rol (diseñador, músico...)';
+    rol.value = c.rol || '';
+    rol.style.cssText = 'flex:1;';
+    rol.addEventListener('input', () => { state.colabs[i].rol = rol.value; update(); });
+    const cajaMonto = document.createElement('div');
+    cajaMonto.className = 'la-input-wrap';
+    cajaMonto.style.cssText = 'flex:1;';
+    const sym = document.createElement('span');
+    sym.className = 'la-prefix';
+    sym.setAttribute('data-sym', '');
+    sym.textContent = moneda().s;
+    const monto = document.createElement('input');
+    monto.type = 'text';
+    monto.className = 'has-prefix';
+    monto.value = c.monto || '';
+    monto.placeholder = 'Lo que cobra';
+    monto.setAttribute('inputmode', 'numeric');
+    monto.setAttribute('autocomplete', 'off');
+    monto.setAttribute('data-money', '');
+    monto.setAttribute('data-colab', String(i));
+    monto.addEventListener('input', () => {
+      formatearCampo(monto);
+      state.colabs[i].monto = monto.value;
+      update();
+    });
+    cajaMonto.appendChild(sym);
+    cajaMonto.appendChild(monto);
+    const quitar = document.createElement('button');
+    quitar.type = 'button';
+    quitar.innerHTML = '×';
+    quitar.style.cssText = 'width:38px;height:38px;border-radius:8px;background:transparent;border:1.5px solid var(--la-border);color:var(--la-muted);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;';
+    quitar.addEventListener('click', () => {
+      state.colabs.splice(i, 1);
+      pintarColabs();
+      update();
+    });
+    fila.appendChild(rol);
+    fila.appendChild(cajaMonto);
+    fila.appendChild(quitar);
+    wrap.appendChild(fila);
+  });
+  ajustarPrefijos();
+}
+if (o('colab-add')) {
+  o('colab-add').addEventListener('click', () => {
+    state.colabs.push({ rol: '', monto: '' });
+    pintarColabs();
+    update();
+  });
+}
+
+/* ---- Niveles ---- */
+const botonesNivel = todos('.la-level');
+function setLevel(l, avisar) {
+  const antes = state.nivel;
+  state.nivel = l;
+  botonesNivel.forEach(b => {
+    const on = parseInt(b.getAttribute('data-level'), 10) === l;
+    b.classList.toggle('is-active', on);
+    b.setAttribute('aria-selected', on ? 'true' : 'false');
+  });
+  const hint = o('levelhint');
+  if (hint && CFG.niveles[l]) hint.innerHTML = CFG.niveles[l].hint;
+  todos('[data-lvl]').forEach(el => {
+    const ok = el.getAttribute('data-lvl').split(' ').indexOf(String(l)) !== -1;
+    el.classList.toggle('la-hide', !ok);
+  });
+  let n = 0;
+  todos('[data-card]').forEach(c => {
+    if (c.classList.contains('la-hide')) return;
+    n++;
+    const s = c.querySelector('.la-step');
+    if (s) s.textContent = String(n).padStart(2, '0');
+  });
+  update();
+}
+botonesNivel.forEach(b => {
+  b.addEventListener('click', () => {
+    setLevel(parseInt(b.getAttribute('data-level'), 10), true);
+  });
+});
+
+/* ---- Valor hora ---- */
+function horasMes() { return num('horasdia', 8) * DIAS_MES; }
+function valorHora() {
+  const sueldo = num('sueldo', 0);
+  const hm = horasMes();
+  if (sueldo <= 0 || hm <= 0) return 0;
+  return sueldo / hm;
+}
+
+/* ---- CÁLCULO ---- */
+function calcular() {
+  const L = state.nivel;
+  const vh = valorHora();
+  const r = { vh, lineas: [], ok: vh > 0 };
+
+  let unit = 0;
+  if (L === 1) {
+    const ht = num('horastotal', 0);
+    unit = ht * vh;
+    r.horasTotales = ht;
+    if (ht > 0) r.lineas.push({ k: 'Tu tiempo (' + horasTxt(ht) + ' hs × ' + fmt(vh) + ')', v: unit });
+  } else {
+    const tareas = [
+      { n: 'Investigación / Concepto', h: num('h-investigacion', 0), m: CFG.mult['h-investigacion'] },
+      { n: 'Diseño / Producción', h: num('h-produccion', 0), m: CFG.mult['h-produccion'] },
+      { n: 'Revisiones', h: num('h-revisiones', 0), m: CFG.mult['h-revisiones'] },
+      { n: 'Gestión / Comunicación', h: num('h-gestion', 0), m: CFG.mult['h-gestion'] },
+      { n: 'Entrega / Archivado', h: num('h-entrega', 0), m: CFG.mult['h-entrega'] }
+    ];
+    let htot = 0;
+    tareas.forEach(t => {
+      if (t.h <= 0) return;
+      const sub = t.h * vh * t.m;
+      unit += sub;
+      htot += t.h;
+      r.lineas.push({
+        k: t.n + ' (' + horasTxt(t.h) + ' hs' + (t.m !== 1 ? ' ' + mult(t.m) : '') + ')',
+        v: sub
+      });
+    });
+    r.horasTotales = htot;
+  }
+  r.trabajoUnit = unit;
+
+  const cant = (L >= 2) ? Math.max(1, Math.round(num('cantidad', 1))) : 1;
+  let totalPiezas = unit * cant;
+  const dPct = (L >= 2 && cant > 1) ? descuentoVolumen(cant) : 0;
+  const desc = totalPiezas * dPct / 100;
+  if (cant > 1) r.lineas.push({ k: '× ' + cant + ' piezas', v: totalPiezas, sub: true });
+  if (desc > 0) r.lineas.push({ k: 'Descuento por volumen (' + pct(dPct) + ')', v: -desc, neg: true });
+  const trabajoNeto = totalPiezas - desc;
+  r.cant = cant;
+  r.descPct = dPct;
+  r.trabajoNeto = trabajoNeto;
+
+  const fc = factorContexto();
+  const ajuste = trabajoNeto * (fc - 1);
+  const trabajoAjustado = trabajoNeto * fc;
+  if (Math.abs(ajuste) > 0.005) {
+    r.lineas.push({ k: 'Ajuste por contexto (' + mult(fc) + ')', v: ajuste, neg: ajuste < 0, pos: ajuste > 0 });
+  }
+  r.factor = fc;
+
+  let colabs = 0;
+  if (L === 3) {
+    state.colabs.forEach(c => {
+      const v = desformatear(c.monto || '');
+      if (isNaN(v) || v <= 0) return;
+      colabs += v;
+      r.lineas.push({ k: c.rol || 'Camarada', v: v });
+    });
+  }
+  r.colabs = colabs;
+
+  const viaticos = (L >= 2) ? num('viaticos', 0) : 0;
+  let amort = 0, fijos = 0;
+  if (L >= 2) {
+    const eq = num('equipo', 0), vu = num('vidautil', 4), ta = num('trabajosanio', 40);
+    if (eq > 0 && vu > 0 && ta > 0) amort = eq / (vu * ta);
+    const gf = num('fijos', 0), tm = num('trabajosmes', 4);
+    if (gf > 0 && tm > 0) fijos = gf / tm;
+  }
+
+  if (viaticos > 0) r.lineas.push({ k: 'Viáticos / costos directos', v: viaticos });
+  if (amort > 0) r.lineas.push({ k: 'Amortización de equipo', v: amort });
+  if (fijos > 0) r.lineas.push({ k: 'Gastos fijos del negocio', v: fijos });
+  r.amort = amort;
+  r.fijos = fijos;
+  r.viaticos = viaticos;
+
+  const subtotal = trabajoAjustado + colabs + viaticos + amort + fijos;
+  r.subtotal = subtotal;
+
+  const mPct = (L === 3) ? num('margen', 25) : 0;
+  const margen = subtotal * mPct / 100;
+  r.margenPct = mPct;
+  if (margen > 0) r.lineas.push({ k: 'Tu margen (' + pct(mPct) + ')', v: margen });
+  const conMargen = subtotal + margen;
+
+  const impPct = (L >= 2) ? num('impuestos', 0) : 0;
+  const comPct = (L >= 2) ? num('comision', 0) : 0;
+  const cargaPct = impPct + comPct;
+  let carga = 0;
+  if (cargaPct > 0 && cargaPct < 100) {
+    carga = conMargen / (1 - cargaPct / 100) - conMargen;
+    if (impPct > 0) r.lineas.push({ k: 'Impuestos (' + pct(impPct) + ')', v: carga * impPct / cargaPct });
+    if (comPct > 0) r.lineas.push({ k: 'Comisiones (' + pct(comPct) + ')', v: carga * comPct / cargaPct });
+  }
+  r.impPct = impPct;
+  r.comPct = comPct;
+  r.exacto = conMargen + carga;
+  r.calculado = niceRound(r.exacto);
+  r.final = r.calculado;
+
+  r.piso = trabajoNeto + colabs + viaticos + amort + fijos;
+  r.techo = niceRound(r.exacto * 1.25);
+
+  r.lineas.push({ k: 'Precio final', v: r.final, sub: true });
+
+  const cargaReal = r.final * cargaPct / 100;
+  const neto = r.final - cargaReal - colabs - viaticos - amort - fijos;
+  r.porHora = neto / Math.max(0.0001, r.horasTotales * r.cant);
+  r.margen = margen;
+
+  return r;
+}
+
+/* ---- Pintar ---- */
+function update() {
+  sincronizarCampos();
+  const r = calcular();
+  pintarValorHora(r);
+
+  const elPrecio = o('precio');
+  const elNota = o('nota');
+  const elPiso = o('piso');
+  const elTecho = o('techo');
+  const elRows = o('break-rows');
+
+  if (!r.ok || r.final <= 0) {
+    if (elPrecio) elPrecio.textContent = '—';
+    if (elNota) elNota.textContent = (r.vh <= 0) ? 'Poné cuánto querés ganar por mes y arrancamos.' : 'Cargá las horas del proyecto.';
+    if (elPiso) elPiso.textContent = '—';
+    if (elTecho) elTecho.textContent = '—';
+    if (elRows) elRows.innerHTML = '<div class="la-break-row"><span>Todavía no hay números</span><span>—</span></div>';
+  } else {
+    if (elPrecio) elPrecio.textContent = fmt(r.final);
+    if (elNota) {
+      elNota.textContent = (r.cant > 1 ? r.cant + ' piezas' : 'Proyecto completo') +
+        ' · ' + horasTxt(r.horasTotales * r.cant) + ' hs · te queda ' +
+        fmt(r.porHora) + ' limpio por hora';
+    }
+    if (elPiso) elPiso.textContent = fmt(r.piso);
+    if (elTecho) elTecho.textContent = fmt(r.techo);
+    if (elRows) {
+      let html = '';
+      r.lineas.forEach(l => {
+        const cls = 'la-break-row' + (l.sub ? ' is-sub' : '') + (l.neg ? ' is-neg' : '');
+        const val = (l.v < 0) ? '− ' + fmt(Math.abs(l.v)) : ((l.pos ? '+ ' : '') + fmt(l.v));
+        html += '<div class="' + cls + '"><span></span><span>' + val + '</span></div>';
+      });
+      elRows.innerHTML = html;
+      const filas = elRows.children;
+      for (let i = 0; i < filas.length; i++) {
+        filas[i].firstChild.textContent = r.lineas[i].k;
+      }
+    }
+  }
+
+  const fr = o('factor-resumen');
+  if (fr) {
+    const deltaPct = Math.round((r.factor - 1) * 100);
+    let frase;
+    if (deltaPct > 0) frase = 'Este cliente paga <b>+' + deltaPct + '%</b> sobre tu base. Factor: ' + mult(r.factor) + '.';
+    else if (deltaPct < 0) frase = 'Estás resignando <b>' + Math.abs(deltaPct) + '%</b> de tu base. Factor: ' + mult(r.factor) + '.';
+    else frase = 'Este cliente paga tu precio base. Factor: ' + mult(r.factor) + '.';
+    fr.innerHTML = frase;
+  }
+
+  guardar();
+}
+
+function sincronizarCampos() {}
+
+function pintarValorHora(r) {
+  const hd = num('horasdia', 8);
+  const hm = horasMes();
+  const val = o('valorhora');
+  if (val) val.textContent = r.vh > 0 ? fmt(r.vh) + ' / hora' : '—';
+  const det = o('valorhora-detalle');
+  if (det) {
+    const sueldo = num('sueldo', 0);
+    if (sueldo > 0 && hm > 0) {
+      det.textContent = fmt(sueldo) + ' ÷ ' + horasTxt(hm) + ' horas al mes (' + hd + ' hs × ' + DIAS_MES + ' días).';
+    } else {
+      det.textContent = 'Poné cuánto querés ganar.';
+    }
+  }
+}
+
+/* ---- Texto para copiar ---- */
+function textoCliente() {
+  const r = calcular();
+  if (!r || r.final <= 0) return '';
+  const rondas = (state.nivel >= 2) ? Math.round(num('rondas', 2)) : 2;
+  let t = 'PRESUPUESTO · LOST ASTRONAUTA\n';
+  t += 'Total: ' + fmt(r.final) + '\n\n';
+  t += 'Incluye:\n';
+  t += '· ' + (r.cant === 1 ? 'El proyecto completo' : r.cant + ' piezas terminadas') + '\n';
+  t += '· Hasta ' + rondas + (rondas === 1 ? ' ronda' : ' rondas') + ' de correcciones\n';
+  if (r.viaticos > 0) t += '· Viáticos y costos directos\n';
+  t += '· Archivos finales entregados\n\n';
+  t += 'Condiciones:\n';
+  if (state.nivel >= 2 && num('pctronda', 0) > 0) {
+    t += '· Rondas adicionales: ' + pct(num('pctronda', 10)) + ' del total cada una\n';
+  } else {
+    t += '· Rondas adicionales se cotizan aparte\n';
+  }
+  t += '· 50% para comenzar, 50% contra entrega\n';
+  t += '· Presupuesto válido por 15 días\n\n';
+  t += '🖖 Saludos Protónicos y Energías Siderales';
+  return t;
+}
+
+/* ---- PDF ---- */
+const hojaPDF = o('pdf-hoja');
+if (hojaPDF && document.body) document.body.appendChild(hojaPDF);
+
+function esc(s) {
+  return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function campoTxt(n) { const el = f(n); return el ? el.value.trim() : ''; }
+
+function armarPDF() {
+  const r = calcular();
+  if (!hojaPDF || !r || r.final <= 0) return false;
+  const autor = campoTxt('autor');
+  const cliente = campoTxt('cliente');
+  const proyecto = campoTxt('proyecto');
+  const rondas = (state.nivel >= 2) ? Math.round(num('rondas', 2)) : 2;
+  const hoy = new Date();
+  const vence = new Date(hoy.getTime() + 15 * 86400000);
+  const fecha = hoy.toLocaleDateString('es-CL', { day: '2-digit', month: 'long', year: 'numeric' });
+  const fVence = vence.toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  const dosDig = n => (n < 10 ? '0' : '') + n;
+  const ref = 'LA-' + hoy.getFullYear() + dosDig(hoy.getMonth()+1) + dosDig(hoy.getDate()) + '-' + dosDig(hoy.getHours()) + dosDig(hoy.getMinutes());
+
+  const fila = (rot, val) => '<div><dt>' + esc(rot) + '</dt><dd>' + esc(val) + '</dd></div>';
+
+  let h = '';
+  h += '<header class="la-pdf-cab">';
+  h += '<div class="la-pdf-brand"><div class="la-pdf-logo">LA</div><div class="la-pdf-brand-text"><strong>LOST ASTRONAUTA</strong><span>Industrias Creativas</span></div></div>';
+  h += '<dl class="la-pdf-meta">' + fila('Nº', ref) + fila('Fecha', fecha) + '</dl>';
+  h += '</header>';
+
+  if (proyecto) h += '<div class="la-pdf-proyecto">' + esc(proyecto) + '</div>';
+
+  if (autor || cliente) {
+    h += '<dl class="la-pdf-partes">';
+    if (cliente) h += fila('Para', cliente);
+    if (autor) h += fila('De', autor);
+    h += '</dl>';
+  }
+
+  h += '<section class="la-pdf-bloque"><h4>Qué incluye</h4><ul>';
+  h += '<li>' + esc(r.cant === 1 ? 'El proyecto completo' : r.cant + ' piezas terminadas') + '</li>';
+  if (r.viaticos > 0) h += '<li>Viáticos y costos directos incluidos</li>';
+  h += '<li>Hasta ' + rondas + (rondas === 1 ? ' ronda' : ' rondas') + ' de correcciones</li>';
+  h += '<li>Archivos finales entregados</li>';
+  h += '</ul></section>';
+
+  h += '<section class="la-pdf-bloque"><h4>Condiciones</h4><dl class="la-pdf-cond">';
+  h += fila('Forma de pago', '50% para comenzar, 50% contra entrega');
+  if (state.nivel >= 2 && num('pctronda', 0) > 0) {
+    h += fila('Correcciones extra', pct(num('pctronda', 10)) + ' del total cada ronda');
+  } else {
+    h += fila('Correcciones extra', 'Se cotizan aparte');
+  }
+  h += fila('Moneda', moneda().c);
+  h += fila('Validez', 'Hasta el ' + fVence);
+  h += '</dl></section>';
+
+  h += '<div class="la-pdf-inversion"><span>Inversión total</span><strong>' + esc(fmt(r.final)) + '</strong></div>';
+  h += '<p class="la-pdf-cierre">Para avanzar, respondé este presupuesto y coordinamos el inicio de la misión.</p>';
+  h += '<div class="la-pdf-sig">🖖 Saludos Protónicos y Energías Siderales · lostastronauta.org</div>';
+
+  hojaPDF.innerHTML = h;
+  return true;
+}
+
+function descargarPDF() {
+  if (!armarPDF()) { toast('Cargá los datos primero'); return; }
+  const tituloPrevio = document.title;
+  const quien = campoTxt('cliente') || campoTxt('proyecto');
+  document.title = 'Presupuesto LA' + (quien ? ' - ' + quien : '');
+  hojaPDF.classList.add('is-print');
+  document.body.classList.add('la-print');
+  const limpiar = () => {
+    hojaPDF.classList.remove('is-print');
+    document.body.classList.remove('la-print');
+    document.title = tituloPrevio;
+  };
+  try { window.print(); } catch(e) {}
+  setTimeout(limpiar, 800);
+}
+
+if (o('pdf')) o('pdf').addEventListener('click', descargarPDF);
+
+/* ---- Copiar ---- */
+function toast(msg) {
+  const el = o('toast');
+  if (!el || !msg) return;
+  el.textContent = msg;
+  el.classList.add('is-on');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('is-on'), 2400);
+}
+function copiar(txt, msg) {
+  if (!txt) { toast('Cargá los datos primero'); return; }
+  const listo = () => toast(msg);
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(txt).then(listo, () => respaldo(txt, listo));
+  } else {
+    respaldo(txt, listo);
+  }
+}
+function respaldo(txt, listo) {
+  const ta = document.createElement('textarea');
+  ta.value = txt;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); listo(); } catch(e) { toast('No se pudo copiar'); }
+  document.body.removeChild(ta);
+}
+if (o('copy-cliente')) o('copy-cliente').addEventListener('click', () => copiar(textoCliente(), 'Presupuesto copiado'));
+
+/* ---- Guardar ---- */
+const CAMPOS = ['moneda','sueldo','horasdia','horastotal','h-investigacion','h-produccion','h-revisiones','h-gestion','h-entrega','cantidad','rondas','viaticos','pctronda','equipo','vidautil','trabajosanio','fijos','trabajosmes','impuestos','comision','margen','autor','cliente','proyecto'];
+
+function guardar() {
+  try {
+    const d = { version: 1, nivel: state.nivel, moneda: moneda().c, toggles: state.toggles, v: {} };
+    CAMPOS.forEach(n => { const e = f(n); if (e) d.v[n] = e.value; });
+    d.colabs = state.colabs.map(c => ({ rol: c.rol || '', monto: c.monto || '' }));
+    localStorage.setItem(CLAVE, JSON.stringify(d));
+  } catch(e) {}
+}
+function cargar() {
+  try {
+    const raw = localStorage.getItem(CLAVE);
+    const d = raw ? JSON.parse(raw) : null;
+    if (!d || d.version !== 1) return false;
+    if (f('moneda') && buscarMoneda(d.moneda).c === d.moneda) f('moneda').value = d.moneda;
+    if ([1,2,3].indexOf(d.nivel) !== -1) state.nivel = d.nivel;
+    if (d.v) {
+      CAMPOS.forEach(n => {
+        const e = f(n);
+        if (e && typeof d.v[n] === 'string') e.value = d.v[n];
+      });
+    }
+    if (d.toggles) {
+      CFG.factores.forEach(t => {
+        if (typeof d.toggles[t.id] === 'boolean') state.toggles[t.id] = d.toggles[t.id];
+      });
+    }
+    if (Array.isArray(d.colabs)) {
+      state.colabs = d.colabs.slice(0, 20).map(c => ({ rol: c.rol || '', monto: c.monto || '' }));
+    }
+    return true;
+  } catch(e) { return false; }
+}
+
+/* ---- Listeners ---- */
+function ajustarPrefijos() {
+  todos('.la-prefix').forEach(sp => {
+    const inp = sp.parentNode.querySelector('input');
+    if (!inp) return;
+    const w = sp.offsetWidth;
+    inp.style.paddingLeft = (w > 0 ? (w + 20) : 36) + 'px';
+  });
+}
+
+let monedaPrevia = null;
+if (f('moneda')) {
+  f('moneda').addEventListener('change', () => {
+    const clave = inp => inp.getAttribute('data-f') || ('colab:' + inp.getAttribute('data-colab'));
+    const valores = {};
+    todos('input[data-money]').forEach(inp => {
+      valores[clave(inp)] = desformatear(inp.value, monedaPrevia);
+    });
+    const anterior = monedaPrevia;
+    monedaPrevia = f('moneda').value;
+    const s = moneda().s;
+    todos('[data-sym]').forEach(e => { e.textContent = s; });
+    todos('input[data-money]').forEach(inp => {
+      const v = valores[clave(inp)];
+      inp.value = isNaN(v) ? '' : formatearNumero(convertir(v, anterior, monedaPrevia));
+    });
+    pintarCambio();
+    ajustarPrefijos();
+    update();
+  });
+}
+
+todos('input, select').forEach(el => {
+  if (el.getAttribute('data-f') === 'moneda') return;
+  const esPlata = el.hasAttribute('data-money');
+  const alCambiar = () => {
+    if (esPlata) formatearCampo(el);
+    update();
+  };
+  el.addEventListener('input', alCambiar);
+  el.addEventListener('change', alCambiar);
+});
+
+todos('input[type="number"]').forEach(el => {
+  el.addEventListener('wheel', () => {
+    if (document.activeElement === el) el.blur();
+  }, { passive: true });
+});
+
+/* ---- Arranque ---- */
+cargar();
+monedaPrevia = f('moneda') ? f('moneda').value : CFG.moneda;
+todos('[data-sym]').forEach(e => { e.textContent = moneda().s });
+pintarToggles();
+pintarColabs();
+ajustarPrefijos();
+setTimeout(ajustarPrefijos, 400);
+setLevel(state.nivel, false);
+pintarCambio();
+actualizarTasas();
+
+})();
+</script>
+</body>
+</html>
